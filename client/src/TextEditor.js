@@ -1,7 +1,8 @@
 import React from 'react'
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import "quill/dist/quill.snow.css"
 import Quill from "quill"
+import { io } from 'socket.io-client'
 
 
 const TOOLBAR_OPTIONS = [
@@ -16,6 +17,13 @@ const TOOLBAR_OPTIONS = [
     ["clean"],
   ]
 export default function TextEditor() {
+
+    useEffect(() => {
+        const socket = io("http://localhost:3001")
+        return () => {
+            socket.disconnect()
+        }
+    }, [input])
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
         
