@@ -17,13 +17,26 @@ const TOOLBAR_OPTIONS = [
     ["clean"],
   ]
 export default function TextEditor() {
+    const [socket, setSocket ] = useState()
     const [quill, setQuill] = useState()
     useEffect(() => {
-        const socket = io("http://localhost:3001")
+        const s = io("http://localhost:3001")
+        setSocket(s)
         return () => {
-            socket.disconnect()
+            s.disconnect()
         }
     }, [])
+
+    useEffect(() => {
+      if (socket == null || quill == null) return
+      quill.on('text-change'), (delta, oldDelta, source) => {
+        if (source !== 'user') return
+        socket.emit("send-changes", delta)
+      }
+      return () => {
+        quill.off('text-change',handler)
+      }
+    }, [socket,quill])
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
     
